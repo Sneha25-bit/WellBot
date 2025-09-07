@@ -14,7 +14,206 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_user: boolean
+          message: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_user?: boolean
+          message: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_user?: boolean
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medicine_logs: {
+        Row: {
+          id: string
+          medicine_id: string
+          notes: string | null
+          taken_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          medicine_id: string
+          notes?: string | null
+          taken_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          medicine_id?: string
+          notes?: string | null
+          taken_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "medicine_logs_medicine_id_fkey"
+            columns: ["medicine_id"]
+            isOneToOne: false
+            referencedRelation: "medicines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      medicines: {
+        Row: {
+          ai_suggested: boolean | null
+          created_at: string
+          dosage: string | null
+          frequency: string | null
+          id: string
+          name: string
+          time_of_day: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_suggested?: boolean | null
+          created_at?: string
+          dosage?: string | null
+          frequency?: string | null
+          id?: string
+          name: string
+          time_of_day?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_suggested?: boolean | null
+          created_at?: string
+          dosage?: string | null
+          frequency?: string | null
+          id?: string
+          name?: string
+          time_of_day?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      period_tracker: {
+        Row: {
+          created_at: string
+          cycle_date: string
+          flow_intensity: number | null
+          id: string
+          notes: string | null
+          symptoms: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          cycle_date: string
+          flow_intensity?: number | null
+          id?: string
+          notes?: string | null
+          symptoms?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          cycle_date?: string
+          flow_intensity?: number | null
+          id?: string
+          notes?: string | null
+          symptoms?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      personalized_plans: {
+        Row: {
+          calories: number | null
+          created_at: string
+          day_number: number
+          food_item: string
+          id: string
+          meal_type: string
+          notes: string | null
+          protein: string | null
+          user_id: string
+        }
+        Insert: {
+          calories?: number | null
+          created_at?: string
+          day_number: number
+          food_item: string
+          id?: string
+          meal_type: string
+          notes?: string | null
+          protein?: string | null
+          user_id: string
+        }
+        Update: {
+          calories?: number | null
+          created_at?: string
+          day_number?: number
+          food_item?: string
+          id?: string
+          meal_type?: string
+          notes?: string | null
+          protein?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          allergies: string | null
+          chronic_illness: string | null
+          created_at: string
+          enable_period_tracker: boolean | null
+          first_name: string | null
+          gender: string | null
+          id: string
+          last_name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          allergies?: string | null
+          chronic_illness?: string | null
+          created_at?: string
+          enable_period_tracker?: boolean | null
+          first_name?: string | null
+          gender?: string | null
+          id?: string
+          last_name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          allergies?: string | null
+          chronic_illness?: string | null
+          created_at?: string
+          enable_period_tracker?: boolean | null
+          first_name?: string | null
+          gender?: string | null
+          id?: string
+          last_name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
