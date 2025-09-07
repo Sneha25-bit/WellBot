@@ -1,9 +1,30 @@
-import { Heart, Menu } from "lucide-react";
+import { Heart, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out.",
+      });
+      navigate("/");
+    }
+  };
 
   return (
     <header className="bg-card border-b border-border sticky top-0 z-50 backdrop-blur-sm">
@@ -25,6 +46,12 @@ const Header = () => {
           <Button variant="ghost" onClick={() => navigate("/medicine")}>Medicine</Button>
           <Button variant="ghost" onClick={() => navigate("/plan")}>My Plan</Button>
           <Button variant="ghost" onClick={() => navigate("/profile")}>Profile</Button>
+          {user && (
+            <Button variant="ghost" onClick={handleLogout}>
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          )}
         </nav>
 
         <Button variant="ghost" size="icon" className="md:hidden">

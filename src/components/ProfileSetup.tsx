@@ -5,22 +5,64 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Heart, Shield, Calendar } from "lucide-react";
+import { User, Heart, Shield, Calendar, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const ProfileSetup = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    first_name: "",
+    last_name: "",
     age: "",
     gender: "",
     allergies: "",
-    chronicIllness: "",
-    enablePeriodTracker: false
+    chronic_illness: "",
+    enable_period_tracker: false
   });
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here we would save to localStorage or database
-    console.log("Profile data:", formData);
+    if (!user) return;
+    
+    setLoading(true);
+    
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          age: parseInt(formData.age) || null,
+          gender: formData.gender,
+          allergies: formData.allergies,
+          chronic_illness: formData.chronic_illness,
+          enable_period_tracker: formData.enable_period_tracker
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile Updated!",
+        description: "Your health profile has been saved successfully.",
+      });
+      
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save profile",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,27 +83,40 @@ const ProfileSetup = () => {
             {/* Basic Info Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">Full Name</Label>
+                <Label htmlFor="first_name" className="text-sm font-medium">First Name</Label>
                 <Input
-                  id="name"
+                  id="first_name"
                   type="text"
-                  placeholder="Enter your name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  placeholder="Enter your first name"
+                  value={formData.first_name}
+                  onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                   className="medical-card"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="age" className="text-sm font-medium">Age</Label>
+                <Label htmlFor="last_name" className="text-sm font-medium">Last Name</Label>
                 <Input
-                  id="age"
-                  type="number"
-                  placeholder="Enter your age"
-                  value={formData.age}
-                  onChange={(e) => setFormData({...formData, age: e.target.value})}
+                  id="last_name"
+                  type="text"
+                  placeholder="Enter your last name"
+                  value={formData.last_name}
+                  onChange={(e) => setFormData({...formData, last_name: e.target.value})}
                   className="medical-card"
                 />
               </div>
+            </div>
+
+            {/* Age */}
+            <div className="space-y-2">
+              <Label htmlFor="age" className="text-sm font-medium">Age</Label>
+              <Input
+                id="age"
+                type="number"
+                placeholder="Enter your age"
+                value={formData.age}
+                onChange={(e) => setFormData({...formData, age: e.target.value})}
+                className="medical-card"
+              />
             </div>
 
             {/* Gender Selection */}
@@ -100,13 +155,13 @@ const ProfileSetup = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="chronicIllness" className="text-sm font-medium">Chronic Conditions</Label>
+                <Label htmlFor="chronic_illness" className="text-sm font-medium">Chronic Conditions</Label>
                 <Input
-                  id="chronicIllness"
+                  id="chronic_illness"
                   type="text"
                   placeholder="e.g., diabetes, hypertension, none"
-                  value={formData.chronicIllness}
-                  onChange={(e) => setFormData({...formData, chronicIllness: e.target.value})}
+                  value={formData.chronic_illness}
+                  onChange={(e) => setFormData({...formData, chronic_illness: e.target.value})}
                   className="medical-card"
                 />
               </div>
@@ -122,9 +177,9 @@ const ProfileSetup = () => {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="periodTracker"
-                    checked={formData.enablePeriodTracker}
+                    checked={formData.enable_period_tracker}
                     onCheckedChange={(checked) => 
-                      setFormData({...formData, enablePeriodTracker: checked as boolean})
+                      setFormData({...formData, enable_period_tracker: checked as boolean})
                     }
                   />
                   <Label htmlFor="periodTracker" className="text-sm">
@@ -140,8 +195,9 @@ const ProfileSetup = () => {
               variant="hero" 
               size="lg" 
               className="w-full"
-              onClick={() => window.location.href = '/dashboard'}
+              disabled={loading}
             >
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Complete Setup
               <Heart className="ml-2 w-5 h-5" />
             </Button>

@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
 import WelcomePage from "./components/WelcomePage";
 import ProfileSetup from "./components/ProfileSetup";
 import Dashboard from "./components/Dashboard";
@@ -12,29 +13,66 @@ import MedicineReminder from "./components/MedicineReminder";
 import PersonalizedPlan from "./components/PersonalizedPlan";
 import PeriodTracker from "./components/PeriodTracker";
 import HealthProfile from "./components/HealthProfile";
+import Auth from "./components/Auth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/setup" element={<ProfileSetup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/chat" element={<ChatBot />} />
-          <Route path="/first-aid" element={<FirstAid />} />
-          <Route path="/medicine" element={<MedicineReminder />} />
-          <Route path="/plan" element={<PersonalizedPlan />} />
-          <Route path="/period-tracker" element={<PeriodTracker />} />
-          <Route path="/profile" element={<HealthProfile />} />
-          <Route path="*" element={<WelcomePage />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/setup" element={
+              <ProtectedRoute>
+                <ProfileSetup />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <ChatBot />
+              </ProtectedRoute>
+            } />
+            <Route path="/first-aid" element={
+              <ProtectedRoute>
+                <FirstAid />
+              </ProtectedRoute>
+            } />
+            <Route path="/medicine" element={
+              <ProtectedRoute>
+                <MedicineReminder />
+              </ProtectedRoute>
+            } />
+            <Route path="/plan" element={
+              <ProtectedRoute>
+                <PersonalizedPlan />
+              </ProtectedRoute>
+            } />
+            <Route path="/period-tracker" element={
+              <ProtectedRoute>
+                <PeriodTracker />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile" element={
+              <ProtectedRoute>
+                <HealthProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<WelcomePage />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

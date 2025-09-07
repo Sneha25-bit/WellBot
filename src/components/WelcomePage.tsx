@@ -1,13 +1,24 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Heart, Shield, Stethoscope } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const WelcomePage = () => {
   const [isAnimated, setIsAnimated] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => setIsAnimated(true), 100);
   }, []);
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen soft-gradient flex items-center justify-center p-4">
@@ -52,7 +63,7 @@ const WelcomePage = () => {
           variant="hero" 
           size="lg" 
           className="w-full max-w-sm mx-auto"
-          onClick={() => window.location.href = '/setup'}
+          onClick={() => navigate('/auth')}
         >
           Get Started
           <Heart className="ml-2 w-5 h-5" />
